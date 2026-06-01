@@ -7,7 +7,8 @@ GameScene::~GameScene() { Model2::StaticFinalize(); }
 void GameScene::Initialize() {
 	Model2::StaticInitialize();
 
-	model_ = Model2::CreateSquare(5); // ←四角形
+	// model_ = Model2::CreateSquare(5); // ←四角形
+	model_ = Model2::CreateRing(8);
 	worldTransform_.Initialize();
 	camera_.Initialize();
 

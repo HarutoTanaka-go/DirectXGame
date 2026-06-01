@@ -143,6 +143,8 @@ public: // 静的メンバ関数
 	/// <returns></returns>
 	static Model2* CreateSquare(int max);
 
+	static Model2* CreateRing(int max);
+
 	/// <summary>
 	/// 描画前処理
 	/// </summary>
@@ -192,6 +194,12 @@ public: // メンバ関数
 	/// <param name="lightGroup">ライトグループ</param>
 	void SetLightGroup(const LightGroup* lightGroup) { lightGroup_ = lightGroup; }
 
+
+
+
+
+
+
 private: // メンバ変数
 	// 名前
 	std::string name_;
@@ -203,6 +211,12 @@ private: // メンバ変数
 	std::unique_ptr<Material> defaultMaterial_ = nullptr;
 	// ライト
 	const LightGroup* lightGroup_ = nullptr;
+
+
+
+
+
+
 
 private: // メンバ関数
 	/// <summary>
@@ -241,5 +255,14 @@ private: // メンバ関数
 	/// </summary>
 	void LoadTextures();
 };
+
+
+
+
+
+
+
+
+
 
 } // namespace KamataEngine
