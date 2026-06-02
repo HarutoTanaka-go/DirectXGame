@@ -24,6 +24,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// DirectXCommonクラスが管理している、コマンドリストの取得
 	ID3D12GraphicsCommandList* commandList = dxCommon->GetCommandList();
 
+
 	// RootSignature作成　-------------------------------------
 	// 構造体にデータを用意する
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
