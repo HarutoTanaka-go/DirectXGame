@@ -92,19 +92,6 @@ public: // 列挙子
 		kObjectColor,    // オブジェクトアルファ
 	};
 
-	/// <summary>
-	/// ヒット演出エフェクト
-	/// </summary>
-	enum class State {
-		kSpread, // 拡大中
-		kFade,   // フェードアウト中
-		kDead    // 死亡
-	};
-
-	//static Effect* Create(const KamataEngine::Vector3& position);
-
-	bool IsDead() const { return state_ == State::kDead; }
-
 private:
 	static const char* kBaseDirectory;
 	static const char* kDefaultModelName;
