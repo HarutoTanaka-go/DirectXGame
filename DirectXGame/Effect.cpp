@@ -1,5 +1,5 @@
+#include "Effect.h"
 // #include <3d\Model.h>
-#include "Model2.h"
 #include <3d\Camera.h>
 #include <3d\Material.h>
 #include <3d\WorldTransform.h>
@@ -25,33 +25,33 @@ namespace KamataEngine {
 /// <summary>
 /// 静的メンバ変数の実体
 /// </summary>
-const char* Model2::kBaseDirectory = "Resources/";
-const char* Model2::kDefaultModelName = "cube";
+const char* Effect::kBaseDirectory = "Resources/";
+const char* Effect::kDefaultModelName = "cube";
 ModelCommon2* ModelCommon2::sInstance_ = nullptr;
 
-void Model2::StaticInitialize() { ModelCommon2::GetInstance()->Initialize(); }
+void Effect::StaticInitialize() { ModelCommon2::GetInstance()->Initialize(); }
 
-void Model2::StaticFinalize() { ModelCommon2::GetInstance()->Terminate(); }
+void Effect::StaticFinalize() { ModelCommon2::GetInstance()->Terminate(); }
 
-Model2* Model2::Create() {
+Effect* Effect::Create() {
 	// メモリ確保
-	Model2* instance = new Model2;
+	Effect* instance = new Effect;
 	instance->InitializeFromFile(kDefaultModelName, false);
 
 	return instance;
 }
 
-Model2* Model2::CreateFromOBJ(const std::string& modelname, bool smoothing) {
+Effect* Effect::CreateFromOBJ(const std::string& modelname, bool smoothing) {
 	// メモリ確保
-	Model2* instance = new Model2;
+	Effect* instance = new Effect;
 	instance->InitializeFromFile(modelname, smoothing);
 
 	return instance;
 }
 
-Model2* Model2::CreateSphere(uint32_t divisionVertial, uint32_t divisionHorizontal) {
+Effect* Effect::CreateSphere(uint32_t divisionVertial, uint32_t divisionHorizontal) {
 	// メモリ確保
-	Model2* instance = new Model2;
+	Effect* instance = new Effect;
 	std::vector<Mesh::VertexPosNormalUv> vertices;
 	std::vector<uint32_t> indices;
 
@@ -69,9 +69,6 @@ Model2* Model2::CreateSphere(uint32_t divisionVertial, uint32_t divisionHorizont
 	const float kLonEvery = pi * 2.0f / float(divisionHorizontal);
 	// 緯度分割1つ分の角度
 	const float kLatEvery = pi / float(divisionVertial);
-
-
-
 
 	// 座標計算
 	// 緯度の方向に分割
@@ -112,8 +109,6 @@ Model2* Model2::CreateSphere(uint32_t divisionVertial, uint32_t divisionHorizont
 		}
 	}
 
-
-
 	// インデックス計算
 	// 緯度の方向に分割
 	for (uint32_t latIndex = 0; latIndex < divisionVertial; ++latIndex) {
@@ -137,9 +132,9 @@ Model2* Model2::CreateSphere(uint32_t divisionVertial, uint32_t divisionHorizont
 }
 
 // 四角形モデルの生成
-Model2* Model2::CreateSquare(int max) {
+Effect* Effect::CreateSquare(int max) {
 	// メモリ確保
-	Model2* instance = new Model2;
+	Effect* instance = new Effect;
 	std::vector<Mesh::VertexPosNormalUv> vertices;
 	std::vector<uint32_t> indices;
 
@@ -193,8 +188,8 @@ Model2* Model2::CreateSquare(int max) {
 	return instance;
 }
 
-Model2* Model2::CreateRing(int max) {
-	Model2* instance = new Model2;
+Effect* Effect::CreateRing(int max) {
+	Effect* instance = new Effect;
 
 	std::vector<Mesh::VertexPosNormalUv> vertices;
 	std::vector<uint32_t> indices;
@@ -261,11 +256,72 @@ Model2* Model2::CreateRing(int max) {
 	return instance;
 }
 
-void Model2::PreDraw(ID3D12GraphicsCommandList* commandList) { ModelCommon2::GetInstance()->PreDraw(commandList); }
+Effect* Effect::CreateRhombus(int max) {
+	// メモリ確保
+	Effect* instance = new Effect;
 
-void Model2::PostDraw() { ModelCommon2::GetInstance()->PostDraw(); }
+	std::vector<Mesh::VertexPosNormalUv> vertices;
+	std::vector<uint32_t> indices;
 
-void Model2::InitializeFromFile(const std::string& modelname, bool smoothing) {
+	// 頂点数
+	const uint32_t kNumVertices = 4 * max;
+	// インデックス数
+	const uint32_t kNumIndices = 6 * max;
+
+	vertices.resize(kNumVertices);
+	indices.resize(kNumIndices);
+
+	for (int i = 0; i < max; i++) {
+		int vertexIndex = i * 4;
+		int indexIndex = i * 6;
+
+		// 横に並べるためのずらし量
+		float offsetX = static_cast<float>(i) * 3.0f;
+
+		// 菱形のサイズ
+		float width = 10.0f;
+		float height = 10.0f;
+
+		// 上
+		vertices[vertexIndex + 0].pos = {offsetX + 0.0f, height, 0.0f};
+		vertices[vertexIndex + 0].normal = {0.0f, 0.0f, 1.0f};
+		vertices[vertexIndex + 0].uv = {0.5f, 0.0f};
+
+		// 左
+		vertices[vertexIndex + 1].pos = {offsetX - width, 0.0f, 0.0f};
+		vertices[vertexIndex + 1].normal = {0.0f, 0.0f, 1.0f};
+		vertices[vertexIndex + 1].uv = {0.0f, 0.5f};
+
+		// 下
+		vertices[vertexIndex + 2].pos = {offsetX + 0.0f, -height, 0.0f};
+		vertices[vertexIndex + 2].normal = {0.0f, 0.0f, 1.0f};
+		vertices[vertexIndex + 2].uv = {0.5f, 1.0f};
+
+		// 右
+		vertices[vertexIndex + 3].pos = {offsetX + width, 0.0f, 0.0f};
+		vertices[vertexIndex + 3].normal = {0.0f, 0.0f, 1.0f};
+		vertices[vertexIndex + 3].uv = {1.0f, 0.5f};
+
+		// 三角形2枚で菱形を作る
+		indices[indexIndex + 0] = vertexIndex + 0;
+		indices[indexIndex + 1] = vertexIndex + 2;
+		indices[indexIndex + 2] = vertexIndex + 1;
+
+		indices[indexIndex + 3] = vertexIndex + 0;
+		indices[indexIndex + 4] = vertexIndex + 3;
+		indices[indexIndex + 5] = vertexIndex + 2;
+	}
+
+	instance->InitializeFromVertices(vertices, indices);
+
+	return instance;
+}
+
+void Effect::PreDraw(ID3D12GraphicsCommandList* commandList) { ModelCommon2::GetInstance()->PreDraw(commandList); }
+
+void Effect::PostDraw() { ModelCommon2::GetInstance()->PostDraw(); }
+
+void Effect::InitializeFromFile(const std::string& modelname, bool smoothing) {
 	// モデル読み込み
 	LoadModel(modelname, smoothing);
 
@@ -298,7 +354,7 @@ void Model2::InitializeFromFile(const std::string& modelname, bool smoothing) {
 	LoadTextures();
 }
 
-void Model2::InitializeFromVertices(const std::vector<Mesh::VertexPosNormalUv>& vertices, const std::vector<uint32_t>& indices) {
+void Effect::InitializeFromVertices(const std::vector<Mesh::VertexPosNormalUv>& vertices, const std::vector<uint32_t>& indices) {
 
 	// メッシュ生成
 	meshes_.emplace_back(std::make_unique<Mesh>());
@@ -328,7 +384,7 @@ void Model2::InitializeFromVertices(const std::vector<Mesh::VertexPosNormalUv>& 
 	LoadTextures();
 }
 
-void Model2::LoadModel(const std::string& modelname, bool smoothing) {
+void Effect::LoadModel(const std::string& modelname, bool smoothing) {
 	const string modelFileName = modelname + ".obj";
 	const string directoryPath = kBaseDirectory + modelname + "/";
 
@@ -533,7 +589,7 @@ void Model2::LoadModel(const std::string& modelname, bool smoothing) {
 	}
 }
 
-void Model2::LoadMaterial(const std::string& directoryPath, const std::string& filename) {
+void Effect::LoadMaterial(const std::string& directoryPath, const std::string& filename) {
 	// ファイルストリーム
 	std::ifstream file;
 	// マテリアルファイルを開く
@@ -650,12 +706,12 @@ void Model2::LoadMaterial(const std::string& directoryPath, const std::string& f
 	}
 }
 
-void Model2::AddMaterial(std::unique_ptr<Material>& material) {
+void Effect::AddMaterial(std::unique_ptr<Material>& material) {
 	// コンテナに登録
 	materials_.emplace(material->name, std::move(material));
 }
 
-void Model2::LoadTextures() {
+void Effect::LoadTextures() {
 	int textureIndex = 0;
 	string directoryPath = name_ + "/";
 
@@ -677,7 +733,9 @@ void Model2::LoadTextures() {
 	}
 }
 
-void Model2::Draw(const WorldTransform& worldTransform, const Camera& camera, const ObjectColor* objectColor) {
+
+
+void Effect::Draw(const WorldTransform& worldTransform, const Camera& camera, const ObjectColor* objectColor) {
 
 	ModelCommon2* common = ModelCommon2::GetInstance();
 
@@ -700,7 +758,7 @@ void Model2::Draw(const WorldTransform& worldTransform, const Camera& camera, co
 	}
 }
 
-void Model2::Draw(const WorldTransform& worldTransform, const Camera& camera, uint32_t textureHadle, const ObjectColor* objectColor) {
+void Effect::Draw(const WorldTransform& worldTransform, const Camera& camera, uint32_t textureHadle, const ObjectColor* objectColor) {
 
 	ModelCommon2* common = ModelCommon2::GetInstance();
 
@@ -723,7 +781,7 @@ void Model2::Draw(const WorldTransform& worldTransform, const Camera& camera, ui
 	}
 }
 
-void Model2::SetAlpha(float alpha) {
+void Effect::SetAlpha(float alpha) {
 
 	for (auto& pair : materials_) {
 		std::unique_ptr<Material>& material = pair.second;
@@ -764,18 +822,18 @@ void ModelCommon2::Initialize() {
 void ModelCommon2::LightCommand(const LightGroup* lightGroup) {
 	// ライトコマンドを積む
 	if (lightGroup) {
-		lightGroup->Draw(commandList_, static_cast<UINT>(Model2::RoomParameter::kLight));
+		lightGroup->Draw(commandList_, static_cast<UINT>(Effect::RoomParameter::kLight));
 	} else {
-		defaultLightGroup_->Draw(commandList_, static_cast<UINT>(Model2::RoomParameter::kLight));
+		defaultLightGroup_->Draw(commandList_, static_cast<UINT>(Effect::RoomParameter::kLight));
 	}
 }
 
 void ModelCommon2::TransformCommand(const WorldTransform& worldTransform, const Camera& camera) {
 	// CBVをセット（ワールド行列）
-	commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(Model2::RoomParameter::kWorldTransform), worldTransform.GetConstBuffer()->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(Effect::RoomParameter::kWorldTransform), worldTransform.GetConstBuffer()->GetGPUVirtualAddress());
 
 	// CBVをセット（カメラ）
-	commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(Model2::RoomParameter::kCamera), camera.GetConstBuffer()->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(static_cast<UINT>(Effect::RoomParameter::kCamera), camera.GetConstBuffer()->GetGPUVirtualAddress());
 }
 
 void ModelCommon2::PreDraw(ID3D12GraphicsCommandList* commandList) {
