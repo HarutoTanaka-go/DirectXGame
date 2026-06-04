@@ -1,5 +1,4 @@
 #pragma once
-
 #include <3d\LightGroup.h>
 #include <3d\Material.h>
 #include <3d\Mesh.h>
@@ -8,40 +7,35 @@
 #include <unordered_map>
 #include <vector>
 
-namespace KamataEngine {
+using namespace KamataEngine;
+//{
 
-class Camera;
-class WorldTransform;
-
-/// <summary>
-/// モデル共通データ
-/// </summary>
-class ModelCommon2 {
+class EffectCommon {
 public:
-	static ModelCommon2* GetInstance();
+	static EffectCommon* GetInstance();
 	static void Terminate();
 
 	/// <summary>
-	/// 初期化
+	///	初期化
 	/// </summary>
 	void Initialize();
 
 	/// <summary>
-	/// ライドコマンドを積む
+	/// ライトコマンドを積む
 	/// </summary>
 	void LightCommand(const LightGroup* lightGroup = nullptr);
 
 	/// <summary>
-	/// トランスフォームコマンドを積む
+	/// 　トランスフォームコマンドを積む
 	/// </summary>
 	/// <param name="worldTransform">ワールドトランスフォーム</param>
 	/// <param name="camera">カメラ</param>
-	void TransformCommand(const WorldTransform& worldTransform, const Camera& camera);
+	void TransformCommand(const WorldTransform* worldTransform, const Camera* camera);
 
 	/// <summary>
 	/// 描画前処理
 	/// </summary>
-	/// <param name="commandList">コマンドリスト</param>
+	/// <param name="commandList">描画コマンドリスト</param>
 	void PreDraw(ID3D12GraphicsCommandList* commandList);
 
 	/// <summary>
@@ -56,18 +50,18 @@ public:
 	ObjectColor* GetObjectColor() const { return defaultObjectColor_.get(); }
 
 private:
-	ModelCommon2() = default;
-	~ModelCommon2() = default;
-	ModelCommon2(ModelCommon2&) = delete;
-	ModelCommon2& operator=(ModelCommon2&) = delete;
+	EffectCommon() = default;
+	~EffectCommon() = default;
+	EffectCommon(EffectCommon&) = delete;
+	EffectCommon& operator=(EffectCommon&) = delete;
 
 	/// <summary>
-	/// グラフィックスパイプラインの初期化
+	/// グラフィックスパイプライン初期化
 	/// </summary>
 	void InitializeGraphicsPipeline();
 
 	// シングルトンインスタンス
-	static ModelCommon2* sInstance_;
+	static EffectCommon* sInstance_;
 
 	// デスクリプタサイズ
 	UINT descriptorHandleIncrementSize_ = 0u;
@@ -83,13 +77,11 @@ private:
 	std::unique_ptr<ObjectColor> defaultObjectColor_;
 };
 
-/// <summary>
-/// モデルデータ
-/// </summary>
-class Model2 {
+class Effect {
+
 public: // 列挙子
 	/// <summary>
-	/// ルートパラメータ番号
+	/// ルートパラメーター
 	/// </summary>
 	enum class RoomParameter {
 		kWorldTransform, // ワールド変換行列
@@ -99,6 +91,19 @@ public: // 列挙子
 		kLight,          // ライト
 		kObjectColor,    // オブジェクトアルファ
 	};
+
+	/// <summary>
+	/// ヒット演出エフェクト
+	/// </summary>
+	enum class State {
+		kSpread, // 拡大中
+		kFade,   // フェードアウト中
+		kDead    // 死亡
+	};
+
+	//static Effect* Create(const KamataEngine::Vector3& position);
+
+	bool IsDead() const { return state_ == State::kDead; }
 
 private:
 	static const char* kBaseDirectory;
@@ -119,7 +124,7 @@ public: // 静的メンバ関数
 	/// 3Dモデル生成
 	/// </summary>
 	/// <returns></returns>
-	static Model2* Create();
+	static Effect* Create();
 
 	/// <summary>
 	/// OBJファイルからメッシュ生成
@@ -127,7 +132,7 @@ public: // 静的メンバ関数
 	/// <param name="modelname">モデル名</param>
 	/// <param name="modelname">エッジ平滑化フラグ</param>
 	/// <returns>生成されたモデル</returns>
-	static Model2* CreateFromOBJ(const std::string& modelname, bool smoothing = false);
+	static Effect* CreateFromOBJ(const std::string& modelname, bool smoothing = false);
 
 	/// <summary>
 	/// 球モデル生成
@@ -135,9 +140,9 @@ public: // 静的メンバ関数
 	/// <param name="divisionVertial">垂直方向（緯度）分割数</param>
 	/// <param name="divisionHorizontal">水平方向（経度）分割数</param>
 	/// <returns>生成されたモデル</returns>
-	static Model2* CreateSphere(uint32_t divisionVertial = 10, uint32_t divisionHorizontal = 10);
+	static Effect* CreateSphere(uint32_t divisionVertial = 10, uint32_t divisionHorizontal = 10);
 
-	static Model2* CreateSquare();
+	static Effect* CreateSquare();
 
 	/// <summary>
 	/// 描画前処理
@@ -151,15 +156,13 @@ public: // 静的メンバ関数
 	static void PostDraw();
 
 public: // メンバ関数
-	~Model2() = default;
+	~Effect() = default;
 
 	/// <summary>
-	/// 描画
+	/// 更新
 	/// </summary>
-	/// <param name="worldTransform">ワールドトランスフォーム</param>
-	/// <param name="camera">カメラ</param>
-	/// <param name="objectColor">オブジェクトカラー</param>
-	void Draw(const WorldTransform& worldTransform, const Camera& camera, const ObjectColor* objectColor = nullptr);
+	/// <param name="worldTransform"></param>
+	void Update(WorldTransform& worldTransform);
 
 	/// <summary>
 	/// 描画（テクスチャ差し替え）
@@ -168,27 +171,24 @@ public: // メンバ関数
 	/// <param name="camera">カメラ</param>
 	/// <param name="textureHadle">テクスチャハンドル</param>
 	/// <param name="objectColor">オブジェクトカラー</param>
-	void Draw(const WorldTransform& worldTransform, const Camera& camera, uint32_t textureHadle, const ObjectColor* objectColor = nullptr);
-
+	void Draw(const WorldTransform& worldTransform, const Camera& camera, const ObjectColor* objectColor = nullptr);
 	/// <summary>
 	/// メッシュコンテナを取得
 	/// </summary>
 	/// <returns>メッシュコンテナ</returns>
 	inline const std::vector<std::unique_ptr<Mesh>>& GetMeshes() { return meshes_; }
-
 	/// <summary>
 	/// 全マテリアルにアルファ値を設定する
 	/// </summary>
 	/// <param name="alpha"></param>
 	void SetAlpha(float alpha);
-
 	/// <summary>
 	/// ライトグループを設定する
 	/// </summary>
 	/// <param name="lightGroup">ライトグループ</param>
 	void SetLightGroup(const LightGroup* lightGroup) { lightGroup_ = lightGroup; }
 
-private: // メンバ変数
+private:
 	// 名前
 	std::string name_;
 	// メッシュコンテナ
@@ -197,8 +197,17 @@ private: // メンバ変数
 	std::unordered_map<std::string, std::unique_ptr<Material>> materials_;
 	// デフォルトマテリアル
 	std::unique_ptr<Material> defaultMaterial_ = nullptr;
-	// ライト
 	const LightGroup* lightGroup_ = nullptr;
+
+	State state_ = State::kSpread;
+	// カウンター
+	uint32_t counter_ = 0;
+
+	// 拡大アニメーションの時間
+	static inline const uint32_t kSpreadTime = 10;
+
+	// フェードアウトアニメーションの時間
+	static inline const uint32_t kFadeTime = 20;
 
 private: // メンバ関数
 	/// <summary>
@@ -238,4 +247,4 @@ private: // メンバ関数
 	void LoadTextures();
 };
 
-} // namespace KamataEngine
+//}
