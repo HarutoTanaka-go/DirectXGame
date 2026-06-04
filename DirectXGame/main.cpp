@@ -10,6 +10,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// エンジンの初期化
 	Initialize(L"LE3D_15_タナカ_ハルト_CG4");
 
+
+
 	GameScene* gameScene = new GameScene();
 	gameScene->Initialize();
 

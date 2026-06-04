@@ -1,8 +1,9 @@
 #pragma once
-#include <3d\LightGroup.h>
-#include <3d\Material.h>
-#include <3d\Mesh.h>
-#include <3d\ObjectColor.h>
+//#include <3d\LightGroup.h>
+//#include <3d\Material.h>
+//#include <3d\Mesh.h>
+//#include <3d\ObjectColor.h>
+#include <KamataEngine.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -91,6 +92,19 @@ public: // 列挙子
 		kLight,          // ライト
 		kObjectColor,    // オブジェクトアルファ
 	};
+
+	/// <summary>
+	/// ヒット演出エフェクト
+	/// </summary>
+	enum class State {
+		kSpread, // 拡大中
+		kFade,   // フェードアウト中
+		kDead    // 死亡
+	};
+
+	static Effect* Create(const KamataEngine::Vector3& position);
+
+	bool IsDead() const { return state_ == State::kDead; }
 
 private:
 	static const char* kBaseDirectory;

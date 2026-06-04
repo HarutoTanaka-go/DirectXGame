@@ -19,6 +19,8 @@ public:
 
 	void CreateEffect(Vector3 position);
 
+
+
 private:
 	uint32_t textureHandle_ = 0;
 	Model2* model_ = nullptr;

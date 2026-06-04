@@ -3,6 +3,8 @@
 #include <ctime>
 #include <numbers>
 
+
+
 GameScene::~GameScene() {
 	delete model_;
 	model_ = nullptr;
