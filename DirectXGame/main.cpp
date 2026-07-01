@@ -56,16 +56,16 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	};
 
 	// 頂点データの準備
-VertexData vertices[] = {
-    {{-1.0f,  1.0f, 0.0f, 1.0f}}, // 左上
-    {{ 1.0f,  1.0f, 0.0f, 1.0f}}, // 右上
-    {{-1.0f, -1.0f, 0.0f, 1.0f}}, // 左下
-    {{ 1.0f, -1.0f, 0.0f, 1.0f}}, // 右下
-};
+	VertexData vertices[] = {
+	    {{-1.0f, 1.0f, 0.0f, 1.0f}},  // 左上
+	    {{1.0f, 1.0f, 0.0f, 1.0f}},   // 右上
+	    {{-1.0f, -1.0f, 0.0f, 1.0f}}, // 左下
+	    {{1.0f, -1.0f, 0.0f, 1.0f}},  // 右下
+	};
 
 	// VertexBufferクラスを使って頂点バッファを作成する
 	VertexBuffer vb;
-vb.Create(sizeof(vertices) * 3, sizeof(vertices[0]));
+	vb.Create(sizeof(vertices), sizeof(vertices[0]));
 
 	// 頂点リソースにデータを書き込む
 	VertexData* pGpuVertices = nullptr;
