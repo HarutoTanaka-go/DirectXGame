@@ -54,15 +54,17 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		Vector4 position;
 	};
 
+	// 頂点データの準備
 	VertexData vertices[] = {
-	    {{-1.0f, -1.0f, 0.0f, 1.0f}},
-	    {{-1.0f, 3.0f, 0.0f, 1.0f}},
-	    {{3.0f, -1.0f, 0.0f, 1.0f}},
+	    {{-1.0f, 1.0f, 0.0f, 1.0f}},  // 左上
+	    {{1.0f, 1.0f, 0.0f, 1.0f}},   // 右上
+	    {{-1.0f, -1.0f, 0.0f, 1.0f}}, // 左下
+	    {{1.0f, -1.0f, 0.0f, 1.0f}},  // 右下
 	};
 
 	// VertexBufferクラスを使って頂点バッファを作成する
 	VertexBuffer vb;
-	vb.Create(sizeof(VertexData) * 3, sizeof(VertexData));
+	vb.Create(sizeof(vertices) * 3, sizeof(vertices[0]));
 
 	// 頂点リソースにデータを書き込む
 	VertexData* pGpuVertices = nullptr;
@@ -72,7 +74,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		pGpuVertices[i] = vertices[i];
 	}
 
-	uint16_t indices[] = {0, 1, 2};
+	// 頂点インデックスデータの準備
+	uint16_t indices[] = {
+	    0, 1, 2, // 三角形①
+	    2, 1, 3, // 三角形②
+	};
 
 	// IndexBuffer(IndexResource, IndexResourceView)の生成
 	IndexBuffer ib;
