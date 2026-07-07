@@ -57,10 +57,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// 頂点データの準備
 	VertexData vertices[] = {
-	    {{-1.0f, 1.0f, 0.0f, 1.0f}},  // 左上
-	    {{1.0f, 1.0f, 0.0f, 1.0f}},   // 右上
-	    {{-1.0f, -1.0f, 0.0f, 1.0f}}, // 左下
-	    {{1.0f, -1.0f, 0.0f, 1.0f}},  // 右下
+	    {{-1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f}}, // 左上
+	    {{1.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 0.0f}}, // 右上
+	    {{-1.0f, -1.0f, 0.0f, 1.0f}, {0.0f, 1.0f}}, // 左下
+	    {{1.0f, -1.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},  // 右下
 	};
 
 	// VertexBufferクラスを使って頂点バッファを作成する
@@ -126,16 +126,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		dxCommon->PostDraw();
 	}
 
-	// 解放処理
-	vb.Get()->Release();
-	/*graphicsPipeLineState->Release();*/
-	// signatureBlob->Release();
-	///*if (errorBlob) {
-	//    errorBlob->Release();
-	//}*/
-	// rootSignature->Release();
-	/*vsBlob->Release();
-	psBlob->Release();*/
 
 	// エンジンの終了処理
 	KamataEngine::Finalize();
@@ -143,42 +133,20 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	return 0;
 }
 
-//// シェーダーコンパイル関数
-////  filePath    : シェーダーファイルのパス    例) L"Resources/shaders/TestVS.hlsl"
-////  shaderModel : シェーダーモデル          例) "vs_5_0"
-// ID3DBlob* CompileShader(const std::wstring& filePath, const std::string& shaderModel) {
-//
-//	ID3DBlob* shaderBlob = nullptr;
-//	ID3DBlob* errorBlob = nullptr;
-//
-//	HRESULT hr = D3DCompileFromFile(
-//	    filePath.c_str(), // シェーダーファイル名
-//	    nullptr,
-//	    D3D_COMPILE_STANDARD_FILE_INCLUDE,               // インクルード可能にする
-//	    "main", shaderModel.c_str(),                     // エントリーポイント名、シェーダモデル指定
-//	    D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
-//	    0, &shaderBlob, &errorBlob);
-//	// エラーが発生した場合、止める
-//	if (FAILED(hr)) {
-//		if (errorBlob) {
-//			OutputDebugStringA(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-//			errorBlob->Release();
-//		}
-//		assert(false);
-//	}
-//
-//	// 生成したshaderBlobを返す
-//	return shaderBlob;
-// }
+
 
 void SetupPipelineState(PipelineState& pipelineState, RootSignature& rs, Shader& vs, Shader& ps) {
 
 	// InputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[1] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputElementDescs[1].SemanticName = "TEXCOORD";
+	inputElementDescs[1].SemanticIndex = 0;
+	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
