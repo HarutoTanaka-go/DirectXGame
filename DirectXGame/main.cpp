@@ -274,7 +274,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// 使用するディスクリプターヒープの設定
-		commandList->SetDescriptorHeaps(srvDescriptorHeap->GetDesc().NumDescriptors, &srvDescriptorHeap);
+		commandList->SetDescriptorHeaps(1, &srvDescriptorHeap);
 
 		// SRVののDescriptorTableのGPU側のハンドルをセットする
 		commandList->SetGraphicsRootDescriptorTable(0, srvHandleGPU);
