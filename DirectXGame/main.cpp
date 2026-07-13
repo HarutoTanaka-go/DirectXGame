@@ -211,6 +211,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			break;
 		}
 
+		dxCommon->PreDraw();
 
 		// // TransitionBarrierを SRV ⇒ RTV に設定する
 		D3D12_RESOURCE_BARRIER barrier{};
@@ -274,7 +275,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// 使用するディスクリプターヒープの設定
-		commandList->SetDescriptorHeaps(1, &srvDescriptorHeap);
+		commandList->SetDescriptorHeaps(srvDescriptorHeap->GetDesc().NumDescriptors, &srvDescriptorHeap);
 
 		// SRVののDescriptorTableのGPU側のハンドルをセットする
 		commandList->SetGraphicsRootDescriptorTable(0, srvHandleGPU);
