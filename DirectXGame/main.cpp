@@ -5,6 +5,7 @@
 #include "RootSignature.h"
 #include "Shader.h"
 #include "VertexBuffer.h"
+#include "WorldTransformEx.h"
 #include <Windows.h>
 #include <cassert>
 // #include <d3dcompiler.h>
@@ -188,7 +189,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
-
 	//----------------------------------------------------------------------
 	// 2. SRV(Shader Resource View)の作成
 
@@ -204,6 +204,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	    srvHandleCPU           // SRV用ディスクリプタヒープのCPU Handle
 	);
 
+	// アプリで利用する3Dモデル ====================================
+	// 被写体の準備
+	Model* model = Model::CreateFromOBJ("terrain");
+
+	WorldTransformEx worldTransform;
+	worldTransform.Initialize();
+	worldTransform.scale_ = Vector3(1.0f, 1.0f, 1.0f);
+
+	// カメラの準備
+	Camera camera;
+	camera.Initialize();
+	camera.translation_ = Vector3(0.0f, 1.0f, 0.0f);
+
 	// メインループ
 	while (true) {
 		// エンジンの更新
@@ -211,7 +224,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			break;
 		}
 
+		// world変換行列の定数バッファへの転送
+		worldTransform.rotation_.y += 0.005f; // 適当な回転角度(ラジアン)
+		worldTransform.UpdateMatrix();
+
+		// cameraの更新と定数バッファへの転送
+		camera.UpdateMatrix();
+
 		dxCommon->PreDraw();
+
 
 		// // TransitionBarrierを SRV ⇒ RTV に設定する
 		D3D12_RESOURCE_BARRIER barrier{};
@@ -251,8 +272,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// // 指定した深度で画面全体をクリアする
 		commandList->ClearDepthStencilView(dsvHandleCPU, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-		// =========================================================================
-		//  ここにゲームの 3Dシーン の描画処理を置く ※次回
+		// 描画
+		Model::PreDraw();
+		model->Draw(worldTransform, camera);
+		Model::PostDraw();
+
 		// =========================================================================
 
 		// // TransitionBarrierを元に戻し、PixelShaderが扱えるようにする
@@ -287,6 +311,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// 描画終了
 		dxCommon->PostDraw();
 	}
+
+
+	delete model;
 
 	// 解放処理
 	renderTextureResource->Release();
