@@ -406,9 +406,11 @@ ID3D12Resource* CreateRenderTextureResource(ID3D12Device* device, uint32_t width
 	clearValue.Color[1] = clearColor[1];
 	clearValue.Color[2] = clearColor[2];
 	clearValue.Color[3] = clearColor[3];
-
+	
 	// 4. RenderTextureResourceの生成
 	ID3D12Resource* resource = nullptr;
+	
+	[[maybe_unused]]
 	HRESULT hr = device->CreateCommittedResource(
 	    &heapProperties,                            // Heapの設定
 	    D3D12_HEAP_FLAG_NONE,                       // Heapの特殊な設定
@@ -449,6 +451,7 @@ ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t 
 
 	// 3. Resourceの生成
 	ID3D12Resource* resource = nullptr;
+	[[maybe_unused]]
 	HRESULT hr = device->CreateCommittedResource(
 	    &heapProperties,                  // Heapの設定
 	    D3D12_HEAP_FLAG_NONE,             // Heapの特殊な設定 ★後で変更？
